@@ -26,6 +26,7 @@ class Player(AnimatedGameObject):
         #Delete if there is a current save for current game.
         if os.path.exists("save/save.json"):
             os.remove("save/save.json")
+            self._engine_reference.states[1].__init__(self._engine_reference)
 
     def key_released(self,key):
         match key:
@@ -48,7 +49,6 @@ class Player(AnimatedGameObject):
     
     def attack(self, monster):
         #If still in cooldown.
-        print(time.time_ns()-self.last_attack_epoch)
         if (time.time_ns()-self.last_attack_epoch)<self.ATTACK_COOLDOWN_SECS*10**9:
             return
 

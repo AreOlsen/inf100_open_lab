@@ -32,20 +32,19 @@ class GameObject:
             self.delete()
 
     def handle_collisions(self):
-        #if self.__class__.__name__=="Monster":
-            #print(len(self._engine_reference.states[self._engine_reference.cur_state_index].entities))
         #Get all collidable entities.
         for entity in (filter(lambda x: x.colliding, self._engine_reference.states[self._engine_reference.cur_state_index].entities)):
             #No self collision.
             if entity==self:
                 continue
             
-
-            #ERROR.
+            #Check for overlap with entity.
             x_overlap = abs(self.position[0] - entity.position[0]) < (self.size[0] / 2.0 + entity.size[0] / 2.0)
+            x_border = not (self.size[0]/2 < self.position[0] < self._engine_reference.START_WIDTH-self.size[0]/2) 
             y_overlap = abs(self.position[1] - entity.position[1]) < (self.size[1] / 2.0 + entity.size[1] / 2.0)
+            y_border = not (self.size[1]/2 < self.position[1] < self._engine_reference.START_HEIGHT-self.size[1]/2) 
             #Go back one.
-            if x_overlap and y_overlap:
+            if (x_overlap and y_overlap) or x_border or y_border:
                 self.position[0] -= self.velocity[0] * self._engine_reference.timer_delay / 1000 * 1.01
                 self.position[1] -= self.velocity[1] * self._engine_reference.timer_delay / 1000 * 1.01
                 self.velocity[0]=0

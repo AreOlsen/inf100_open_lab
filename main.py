@@ -26,7 +26,6 @@ game.states=[
             S - downwards\n
             D - right \n
             A - left \n
-            (To move - repeatedly tap move button)\n
             Left click - attack\n
             Esc - menu.
         """

@@ -6,8 +6,9 @@ class State:
     Simple state system.
     (uibinf100graphics has similar, but is more tedious and unscalable.)
     '''
-    def __init__(self, entities=[], background_texture="media/textures/placeholder.png"):
+    def __init__(self, engine_reference, entities=[], background_texture="media/textures/placeholder.png"):
         self.entities = entities
+        self._engine_reference = engine_reference
         self.background_texture = background_texture
         self.background = None
         if background_texture != "":
@@ -16,12 +17,17 @@ class State:
     def game_tick(self):
         pass
 
+    def draw(self, canvas):
+        #Draw background.
+        if self.background != None:
+            image_in_box(canvas,0,0,self._engine_reference.width,self._engine_reference.height,self.background,fit_mode="stretch")
+
 
 class Engine(App):
     '''
     Simple wrapper for uib inf100 app class.
     '''
-    def __init__(self, states=[State(),State(),State(),State()], width=1280, height=720, FPS=100, title="Monster Survival."):
+    def __init__(self, states=[], width=1280, height=720, FPS=100, title="Monster Survival."):
         # All states.
         # Normally state 0 is the menu.
         self.states = states
@@ -50,9 +56,8 @@ class Engine(App):
             entity.game_tick()
 
     def redraw_all(self,canvas): 
-        #Draw state background.
-        if self.states[self.cur_state_index].background != None:
-            image_in_box(canvas,0,0,self.width,self.height,self.states[self.cur_state_index].background,fit_mode="stretch")
+        #Draw state related things, such as background.
+        self.states[self.cur_state_index].draw(canvas)
 
         #Draw entities.
         for entity in self.states[self.cur_state_index].entities:

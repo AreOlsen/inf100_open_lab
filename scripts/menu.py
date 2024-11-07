@@ -46,7 +46,7 @@ class LoadGameButton(RedirectButton):
 
     def mouse_pressed(self,x,y):
         if self.coordinate_in_obj(x,y):
-            self._engine_reference.states[1]=Game()
+            self._engine_reference.states[1]=Game(self._engine_reference)
             self._engine_reference.states[1].load_game(game_save_path="save/save.json")
             self._engine_reference.cur_state_index=self.redirect_state_index
 
@@ -54,8 +54,8 @@ class LoadGameButton(RedirectButton):
 
 
 class Menu(State):
-    def __init__(self, background_texture, menu_elements=[]):
-        super().__init__(menu_elements, background_texture)
+    def __init__(self, engine_reference, background_texture, menu_elements=[]):
+        super().__init__(engine_reference,menu_elements, background_texture)
 
 class StartMenu(Menu):
     '''
@@ -65,7 +65,7 @@ class StartMenu(Menu):
     '''
 
     def __init__(self, engine_reference, background_texture="media/textures/backdrops/menu.png", button_texture="media/textures/hud/banner.png"):
-        super().__init__(background_texture=background_texture)
+        super().__init__(engine_reference,background_texture=background_texture)
         self.entities=[]
         self.engine_reference=engine_reference
         self.button_texture = button_texture
@@ -95,7 +95,7 @@ class StartMenu(Menu):
 class GameOverMenu(Menu):
     def __init__(self, engine_reference, background_texture, button_texture, text=""):
         #Initialize backdrop & board.
-        super().__init__(menu_elements=[
+        super().__init__(engine_reference,menu_elements=[
             Board(engine_reference,
             [engine_reference.width/2,
             engine_reference.height/2]
@@ -117,4 +117,4 @@ class GameOverMenu(Menu):
 
 class Instructions(State):
     def __init__(self, engine_reference, background_texture, instructions=""):
-        super().__init__(entities=[Board(engine_reference,[engine_reference.width/2,engine_reference.height/2],size=(engine_reference.width/2,engine_reference.height/1.5), texture="media/textures/hud/board.png",text=instructions)],background_texture=background_texture)
+        super().__init__(engine_reference,entities=[Board(engine_reference,[engine_reference.width/2,engine_reference.height/2],size=(engine_reference.width/2,engine_reference.height/1.5), texture="media/textures/hud/board.png",text=instructions)],background_texture=background_texture)
