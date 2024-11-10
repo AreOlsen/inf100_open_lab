@@ -11,43 +11,36 @@ class Game(State):
         self.MAX_MONSTERS = 10
         self._engine_reference=engine_reference
 
+    def spawn_monster(self, tries_to_spawn = 10,monster_size = (150,150)):
+        """
+            We try to spawn a monster n times, if we can't place one, we give up might be no available positions. 
+        """
 
-    def spawn_monster(self, tries_to_spawn=10):
-        monster = Monster(self._engine_reference)
-        for _ in range(tries_to_spawn):  # Try to spawn a monster up to n times. 
-            #Random position.
-            pos_x = random.random()*(self._engine_reference.START_WIDTH - monster.size[0]/2)
-            pos_y = random.random()*(self._engine_reference.START_HEIGHT - monster.size[1]/2)
+        for _ in range(tries_to_spawn):
+            available_spawn_position = True
 
-            #Check if the current random position is in collision with another object.
-            collision_detected = False
+            pos_x = random.random()*(self._engine_reference.START_WIDTH - monster_size[0]/2)
+            pos_y = random.random()*(self._engine_reference.START_HEIGHT - monster_size[1]/2)
+
+            monster_corners = [
+                (pos_x - monster_size[0] / 2, pos_y - monster_size[1] / 2),
+                (pos_x + monster_size[0] / 2, pos_y - monster_size[1] / 2),
+                (pos_x - monster_size[0] / 2, pos_y + monster_size[1] / 2),
+                (pos_x + monster_size[0] / 2, pos_y + monster_size[1] / 2)
+            ]
+
+            #Check if collision with any monster.
             for entity in self.entities:
-                # Check all the corners of the monster to see if colliding with any object.
-                corners = [
-                    (pos_x - monster.size[0] / 2, pos_y - monster.size[1] / 2),
-                    (pos_x + monster.size[0] / 2, pos_y - monster.size[1] / 2),
-                    (pos_x - monster.size[0] / 2, pos_y + monster.size[1] / 2),
-                    (pos_x + monster.size[0] / 2, pos_y + monster.size[1] / 2)
-                ]
-                #Inside another entity.
-                for corner in corners:
-                    if entity.coordinate_in_obj(corner[0], corner[1]):
-                        print("Spawning monster collision detected.")
-                        collision_detected = True
-                        break
-                #Break out of entities checking loop.
-                if collision_detected:
-                    break
-
-            #Next random position iteration.
-            if collision_detected:
-                continue
-
-            #If not in any already spawned entities -> spawn the monster.
-            monster.position[0]=pos_x
-            monster.position[1]=pos_y
-            self.entities.append(monster)
-            break
+                #To check for collisions, we check the corners.
+                for corner in monster_corners:
+                    if entity.coordinate_in_obj(corner[0],corner[1]):
+                        available_spawn_position=False
+            
+            if available_spawn_position:
+                monster = Monster(self._engine_reference,monster_size)
+                monster.position = [pos_x,pos_y]
+                self.entities.append(monster)
+                break
 
 
     def spawn_monsters(self):
