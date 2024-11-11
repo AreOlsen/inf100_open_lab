@@ -44,8 +44,10 @@ class Player(AnimatedGameObject):
                 self.velocity[1]=self.SPEED
             case "d":
                 self.velocity[0]=self.SPEED
+                self.image_direction=True
             case "a":
                 self.velocity[0]=-self.SPEED
+                self.image_direction=False
     
     def attack(self, monster):
         #If still in cooldown.

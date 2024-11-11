@@ -28,6 +28,13 @@ class Monster(TexturedGameObject):
         #Point monster towards player.
         self.velocity[0]=player.position[0]-self.position[0]
         self.velocity[1]=player.position[1]-self.position[1]
+
+        #Decide direction of texture.
+        self.image_direction=False
+        if self.velocity[0]>=0:
+            self.image_direction=True
+
+
         #Scale velocity vectors to have correct SPEED.
         velocity_length = (self.velocity[0]**2+self.velocity[1]**2)**0.5
         if velocity_length!=0:
@@ -41,6 +48,5 @@ class Monster(TexturedGameObject):
 
     def mouse_pressed(self, x,y):
         if self.coordinate_in_obj(x,y):
-            print("Pressed")
             player = self._engine_reference.states[self._engine_reference.cur_state_index].entities[0]
             player.attack(self)

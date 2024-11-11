@@ -36,6 +36,12 @@ class Game(State):
                     if entity.coordinate_in_obj(corner[0],corner[1]):
                         available_spawn_position=False
             
+            # Check if the monster is within the screen borders
+            for corner in monster_corners:
+                if corner[0] < 0 or corner[0] > self._engine_reference.START_WIDTH or corner[1] < 0 or corner[1] > self._engine_reference.START_HEIGHT:
+                    available_spawn_position = False
+                    break
+
             if available_spawn_position:
                 monster = Monster(self._engine_reference,monster_size)
                 monster.position = [pos_x,pos_y]
@@ -76,10 +82,18 @@ class Game(State):
                 if entity_index<len(self.entities):
                     self.entities[entity_index].position = [entity["pos_x"], entity["pos_y"]]
                     self.entities[entity_index].hp = entity["hp"]
+                    self.entities[entity_index].size = entity["size"]
                 elif entity["game_object_type"]=="monster":
-                    self.entities.append(Monster(self._engine_reference))
+                    monster = Monster(self._engine_reference, entity["size"])
+                    monster.position = [entity["pos_x"], entity["pos_y"]]
+                    monster.hp = entity["hp"]
+                    self.entities.append(monster)
                 elif entity["game_object_type"]=="player":
-                    self.entities.append(Player(self._engine_reference))
+                    player = Player(self._engine_reference)
+                    player.position = [entity["pos_x"], entity["pos_y"]]
+                    player.hp = entity["hp"]
+                    player.size = entity["size"]
+                    self.entities.append(player)
                 else:
                     print("Unknown entity type.")
 
@@ -93,7 +107,8 @@ class Game(State):
                     "game_object_type":entity.__class__.__name__.lower(),
                     "hp":entity.hp,
                     "pos_x":entity.position[0],
-                    "pos_y":entity.position[1]
+                    "pos_y":entity.position[1],
+                    "size":entity.size
                 })
             self.entities=[]
             with open(game_save_path, "w+") as outfile:

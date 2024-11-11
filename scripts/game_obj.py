@@ -1,5 +1,6 @@
 from uib_inf100_graphics.helpers.image import load_image, scaled_image, image_in_box
 import os
+from PIL import ImageOps
 
 
 class GameObject:
@@ -89,20 +90,25 @@ class TexturedGameObject(GameObject):
     def __init__(self, engine_reference, position=[150,150], size=(50,50), hp=100, texture="media/textures/placeholder.png"):
         super().__init__(engine_reference,position,size,hp)
         self.texture = load_image(texture)
+        self.image_direction=True # Right is true, left is false.
 
 
     ###
     # HANDLE GAME TICK UPDATES.
     ###
     def draw(self, canvas):
-        #Get corners of image.
-        top_left_x = self.position[0]-self.size[0]/2
-        top_left_y=self.position[1]-self.size[1]/2
-        bottom_right_x = self.position[0]+self.size[0]/2
-        bottom_right_y = self.position[1]+self.size[1]/2
-        #Draw image to canvas.
-        image_in_box(canvas, top_left_x,top_left_y, bottom_right_x, bottom_right_y, self.texture,fit_mode="stretch")
+        # Get current frame based on direction
+        direction = 'right' if self.image_direction else 'left'
+        texture = self.texture if direction == 'right' else ImageOps.mirror(self.texture)
 
+        # Get corners of image
+        top_left_x = self.position[0] - self.size[0] / 2
+        top_left_y = self.position[1] - self.size[1] / 2
+        bottom_right_x = self.position[0] + self.size[0] / 2
+        bottom_right_y = self.position[1] + self.size[1] / 2
+
+        # Draw image to canvas
+        image_in_box(canvas, top_left_x, top_left_y, bottom_right_x, bottom_right_y, texture, fit_mode="stretch")
 
 
 class AnimatedGameObject(GameObject):
@@ -116,20 +122,21 @@ class AnimatedGameObject(GameObject):
         self.cur_frame_index = 0
         self.time_since_last_frame = 0
         self.FPS = FPS
+        self.image_direction = True # True is right, left is False.
 
-    def load_animation(self,directory, animation_name):
+    def load_animation(self, directory, animation_name):
         # Get all files in directory and sort them alphabetically
         files = sorted(f for f in os.listdir(directory) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')))
 
-        # Load files into textures
-        textures = [load_image(os.path.join(directory, file)) for file in files]
+        # Load files into textures and create flipped versions
+        textures_right = [load_image(os.path.join(directory, file)) for file in files]
+        textures_left = [ImageOps.mirror(texture) for texture in textures_right]
 
-        # Add entry into animations dict
-        self.animations[animation_name] = textures
+        # Add entries into animations dict
+        self.animations[animation_name] = {'right': textures_right, 'left': textures_left}
 
-
-    def change_animation(self,animation):
-        self.cur_animation=animation
+    def change_animation(self, animation):
+        self.cur_animation = animation
         self.cur_frame_index = 0
         self.time_since_last_frame = 0
 
@@ -137,21 +144,22 @@ class AnimatedGameObject(GameObject):
     # HANDLE GAME TICK UPDATES.
     ###
     def draw(self, canvas):
-        #Get current frame.
-        texture = self.animations[self.cur_animation][self.cur_frame_index]
+        # Get current frame based on direction
+        direction = 'right' if self.image_direction else 'left'
+        texture = self.animations[self.cur_animation][direction][self.cur_frame_index]
 
-        #Get corners of image.
-        top_left_x = self.position[0]-self.size[0]/2
-        top_left_y=self.position[1]-self.size[1]/2
-        bottom_right_x = self.position[0]+self.size[0]/2
-        bottom_right_y = self.position[1]+self.size[1]/2
+        # Get corners of image
+        top_left_x = self.position[0] - self.size[0] / 2
+        top_left_y = self.position[1] - self.size[1] / 2
+        bottom_right_x = self.position[0] + self.size[0] / 2
+        bottom_right_y = self.position[1] + self.size[1] / 2
 
-        #Draw image to canvas.
-        image_in_box(canvas, top_left_x,top_left_y, bottom_right_x, bottom_right_y, texture,fit_mode="stretch")
+        # Draw image to canvas
+        image_in_box(canvas, top_left_x, top_left_y, bottom_right_x, bottom_right_y, texture, fit_mode="stretch")
 
-        #Update animation information.
-        if self.time_since_last_frame>=(1000/self.FPS):
-            self.cur_frame_index+=1
-            self.cur_frame_index%=(len(self.animations[self.cur_animation]))
-            self.time_since_last_frame=0
-        self.time_since_last_frame+=self._engine_reference.timer_delay
+        # Update animation information
+        if self.time_since_last_frame >= (1000 / self.FPS):
+            self.cur_frame_index += 1
+            self.cur_frame_index %= len(self.animations[self.cur_animation][direction])
+            self.time_since_last_frame = 0
+        self.time_since_last_frame += self._engine_reference.timer_delay
