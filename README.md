@@ -35,6 +35,19 @@ To launch the game, execute the `main.py` file:
 python main.py
 ```
 
+## Screenshots
+
+Here are some screenshots from the game:
+
+![Main Menu](screenshots/main_menu.png)
+_Main Menu_
+
+![Gameplay](screenshots/in_game.png)
+_Gameplay_
+
+![Game Over Screen](screenshots/game_over.png)
+_Game Over Screen_
+
 ## Graphics Library
 
 This game uses the `inf100 uib` graphics library with custom implementations and advancements to provide a unique gaming experience.
