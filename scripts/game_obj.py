@@ -146,7 +146,7 @@ class AnimatedGameObject(GameObject):
     def draw(self, canvas):
         # Get current frame based on direction
         direction = 'right' if self.image_direction else 'left'
-        texture = self.animations[self.cur_animation][direction][self.cur_frame_index]
+        texture = self.animations[self.cur_animation][direction][self.cur_frame_index%len(self.animations[self.cur_animation][direction])]
 
         # Get corners of image
         top_left_x = self.position[0] - self.size[0] / 2

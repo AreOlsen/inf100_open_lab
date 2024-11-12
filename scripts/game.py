@@ -36,7 +36,7 @@ class Game(State):
                     if entity.coordinate_in_obj(corner[0],corner[1]):
                         available_spawn_position=False
             
-            # Check if the monster is within the screen borders
+            # Check if the monster is for some reason within the screen borders
             for corner in monster_corners:
                 if corner[0] < 0 or corner[0] > self._engine_reference.START_WIDTH or corner[1] < 0 or corner[1] > self._engine_reference.START_HEIGHT:
                     available_spawn_position = False
